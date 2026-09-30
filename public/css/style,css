@@ -3,7 +3,8 @@
     --sg-green-primary: #2e7d32;
     --sg-green-dark: #1b5e20;
     --sg-green-light: #e8f5e9;
-    --sg-bg-body: #f4f7f6;
+    --sg-green-subtle: #c8e6c9;
+    --sg-bg-body: #f1f8e9; /* Soft green tint background */
 }
 
 body {
@@ -11,23 +12,29 @@ body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-/* Custom Card Styling */
+/* Card Styling with Green Accent Header Border */
 .auth-card {
     border: none;
+    border-top: 5px solid var(--sg-green-primary);
     border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.15) !important;
 }
 
-/* Custom Shamba Primary Buttons */
+/* Green Brand Buttons */
 .btn-shamba {
     background-color: var(--sg-green-primary);
     color: #ffffff;
     border: none;
     font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .btn-shamba:hover {
@@ -35,13 +42,32 @@ body {
     color: #ffffff;
 }
 
+.btn-shamba:active {
+    transform: scale(0.98);
+}
+
 /* Brand Text Color */
 .text-shamba {
     color: var(--sg-green-primary) !important;
 }
 
-/* Focus Ring Customization */
+.bg-shamba-light {
+    background-color: var(--sg-green-light) !important;
+}
+
+/* Focus Ring & Form Control Customization */
 .form-control:focus, .form-select:focus {
     border-color: var(--sg-green-primary);
     box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+}
+
+/* Navbar / Brand Header */
+.shamba-navbar {
+    background-color: var(--sg-green-primary);
+}
+
+/* Footer Styling */
+footer {
+    background-color: #ffffff;
+    border-top: 2px solid var(--sg-green-subtle);
 }
