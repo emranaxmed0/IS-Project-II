@@ -45,6 +45,10 @@ body {
     color: var(--sg-green-primary);
 }
 
+.bg-shamba-light {
+    background-color: var(--sg-green-light);
+}
+
 .form-control, .form-select {
     border-radius: 6px;
     padding: 10px 14px;
