@@ -1,40 +1,48 @@
 <?php
-require_once dirname(__DIR__) . '/../config/db.php';
 
 class AuthController {
     private $pdo;
 
     public function __construct($pdo) {
-        $this->pdo =$pdo;
+        $this->pdo = $pdo;
     }
 
-    /**
-     * Register a new user with secure password hashing
-     */
-    public function register($role_id, $user_name,$phone_number, $password,$region) {
-        try {
-            $hashed_password = password_hash($password, PASSWORD_BCRYPT);$sql = "INSERT INTO `User` (role_id, user_name, phone_number, password, region) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute([$role_id, $user_name,$phone_number, $hashed_password,$region]);
-        } catch (PDOException $e) {
-            // Handle duplicate phone numbers or foreign key errors
-            return false;
+    // Register a new user
+    public function register($role_id, $user_name, $phone_number, $password, $region) {
+        // Check if phone number already exists
+        $checkStmt = $this->pdo->prepare("SELECT user_id FROM user WHERE phone_number = ?");
+        $checkStmt->execute([$phone_number]);
+        if ($checkStmt->fetch()) {
+            return false; // Phone number already registered
         }
+
+        // Hash the password for security
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert new user record
+        $stmt = $this->pdo->prepare("INSERT INTO user (role_id, user_name, phone_number, password, region) VALUES (?, ?, ?, ?, ?)");
+        return $stmt->execute([
+            (int)$role_id,
+            $user_name,
+            $phone_number,
+            $hashedPassword,
+            $region
+        ]);
     }
 
-    /**
-     * Authenticate user by phone number and password
-     */
-    public function login($phone_number,$password) {
-        $stmt =$this->pdo->prepare("SELECT * FROM `User` WHERE phone_number = ?");
-        $stmt->execute([$phone_number]);
-        $user =$stmt->fetch();
+    // Authenticate existing user by phone number or username
+    public function login($identifier, $password) {
+        $stmt = $this->pdo->prepare("SELECT * FROM user WHERE phone_number = ? OR user_name = ?");
+        $stmt->execute([$identifier, $identifier]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password,$user['password'])) {
-            // Remove sensitive password hash from return array
-            unset($user['password']);
-            return $user;
+        if ($user) {
+            // Verify password hash (fallback to plain comparison if legacy non-hashed passwords exist)
+            if (password_verify($password, $user['password']) || $password === $user['password']) {
+                return $user;
+            }
         }
+
         return false;
     }
 }
