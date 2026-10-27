@@ -73,7 +73,7 @@
                 <span>ShambaGuide</span>
             </a>
             <div class="d-flex align-items-center gap-3">
-                <a href="index.php" class="btn btn-sm btn-outline-light px-3 me-2">
+                <a href="userdashboard.php" class="btn btn-sm btn-outline-light px-3 me-2">
                     <i class="bi bi-speedometer2 me-1"></i> Dashboard
                 </a>
             </div>
