@@ -50,7 +50,7 @@ require_once __DIR__ . '/../app/Views/header.php';
                     <div class="text-center mb-4">
                         <i class="bi bi-box-arrow-in-right text-shamba fs-1"></i>
                         <h3 class="fw-bold mt-2 text-shamba">ShambaGuide</h3>
-                        <p class="text-muted">Welcome back! Please log in</p>
+                        <p class="text-muted">Karibu Tena! Ingia</p>
                     </div>
 
                     <?php if ($error): ?>
@@ -62,18 +62,18 @@ require_once __DIR__ . '/../app/Views/header.php';
 
                     <form method="POST" action="login.php">
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Phone Number or Username</label>
-                            <input type="text" name="identifier" class="form-control" placeholder="e.g. 0712345678" required>
+                            <label class="form-label fw-semibold">Nambari ya Simu au Jina</label>
+                            <input type="text" name="identifier" class="form-control" placeholder="k.m. 0712345678" required>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                            <label class="form-label fw-semibold">Neno la Siri</label>
+                            <input type="password" name="password" class="form-control" placeholder="Andika Neno" required>
                         </div>
-                        <button type="submit" class="btn btn-shamba w-100">Log In</button>
+                        <button type="submit" class="btn btn-shamba w-100">Ingia</button>
                     </form>
 
                     <div class="text-center mt-4">
-                        <small class="text-muted">Don't have an account? <a href="signup.php" class="text-shamba text-decoration-none fw-semibold">Register here</a></small>
+                        <small class="text-muted">Huna Akaunti? <a href="signup.php" class="text-shamba text-decoration-none fw-semibold">Jisajili Hapa</a></small>
                     </div>
                 </div>
             </div>

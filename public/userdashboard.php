@@ -36,7 +36,7 @@ $selectedCropId = (int)($_GET['crop_id'] ?? ($crops[0]['crop_id'] ?? 0));
     <!-- Top Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-shamba border-bottom border-dark px-3 py-2">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="userdashboard.php">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="index.php">
                 <i class="bi bi-sprout me-2"></i>ShambaGuide
             </a>
             <div class="d-flex align-items-center gap-4 text-white ms-auto">
