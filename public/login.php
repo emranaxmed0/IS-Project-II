@@ -3,12 +3,7 @@ session_start();
 
 // If user is already logged in, redirect based on role
 if (isset($_SESSION['user'])) {
-    $roleId = (int)($_SESSION['user']['role_id'] ?? $_SESSION['user']['role'] ?? 1);
-    if ($roleId === 3) {
-        header('Location: admin.php');
-    } else {
-        header('Location: index.php');
-    }
+    header('Location: index.php');
     exit();
 }
 
@@ -27,12 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user) {
         $_SESSION['user'] = $user;
-        $roleId = (int)($user['role_id'] ?? 1);
-        if ($roleId === 3) {
-            header('Location: admin.php');
-        } else {
-            header('Location: index.php');
-        }
+        header('Location: index.php');
         exit();
     } else {
         $error = 'Invalid credentials. Please check your details and try again.';
