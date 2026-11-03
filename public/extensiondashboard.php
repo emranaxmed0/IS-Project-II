@@ -86,41 +86,8 @@ if ($activeFarmerId > 0) {
 $cropController = new CropController($pdo);
 $crops = $cropController->getAllCrops();
 $selectedCropId = (int)($_GET['crop_id'] ?? ($crops[0]['crop_id'] ?? 0));
+require_once __DIR__ . '/../app/Views/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="sw">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShambaGuide — Extension Officer Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-</head>
-<body class="bg-light">
-
-    <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-shamba border-bottom border-dark px-3 py-2">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="extensiondashboard.php">
-                <i class="bi bi-person-badge me-2"></i>ShambaGuide — Extension Portal
-            </a>
-            <div class="d-flex align-items-center gap-4 text-white ms-auto">
-                <a href="calendar.php" class="text-white text-decoration-none fw-semibold">Kalenda</a>
-                <a href="crops&disease.php" class="text-white text-decoration-none fw-semibold">Wadudu</a>
-                <div class="dropdown">
-                    <button class="btn btn-sm text-white dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">
-                        <?= $officerName ?> (Officer)
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end border-dark">
-                        <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i>My Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
 
     <!-- Main Content -->
     <div class="container-fluid py-4 px-4">
