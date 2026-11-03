@@ -1,27 +1,48 @@
-/* ==========================================================================
-   ShambaGuide — Unified Dashboard Stylesheet
-   Applicable to: User, Admin & Extension Officer Dashboards
-   ========================================================================== */
+:root {
+    --sg-green-primary: #2e7d32;
+    --sg-green-dark: #1b5e20;
+    --sg-green-light: #e8f5e9;
+    --sg-green-subtle: #a5d6a7;
+    --sg-bg-body: #f1f8e9;
+    --sg-active-mint: #e8f5e9;
+    --sg-border-active: #a5d6a7;
+}
+
+/* Base Body Setup */
+body {
+    background-color: var(--sg-bg-body);
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    color: #2c3e50;
+}
 
 /* Brand Green Palette & Core Elements */
 .bg-shamba { 
-    background-color: #198754; 
+    background-color: var(--sg-green-primary) !important; 
 }
 
 .text-shamba { 
-    color: #198754; 
+    color: var(--sg-green-primary) !important; 
+}
+
+.bg-shamba-light {
+    background-color: var(--sg-green-light) !important;
 }
 
 .btn-shamba { 
-    background-color: #198754; 
+    background-color: var(--sg-green-primary); 
     color: #ffffff; 
     border: 1px solid #000; 
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
 }
 
 .btn-shamba:hover, 
 .btn-shamba:focus { 
-    background-color: #146c43; 
+    background-color: var(--sg-green-dark); 
     color: #ffffff; 
+    box-shadow: 0 4px 12px rgba(27, 94, 32, 0.3);
 }
 
 /* User Dashboard — Sidebar Crop Cards */
@@ -31,8 +52,8 @@
 }
 
 .crop-item.active { 
-    background-color: #d1e7dd; 
-    border-color: #198754; 
+    background-color: var(--sg-active-mint); 
+    border-color: var(--sg-green-primary); 
     font-weight: bold; 
 }
 
@@ -43,27 +64,45 @@
 }
 
 .chat-bubble-user { 
-    background-color: #d1e7dd; 
-    border: 1px solid #a3cfbb; 
+    background-color: var(--sg-active-mint); 
+    border: 1px solid var(--sg-border-active); 
 }
 
 .chat-bubble-ai { 
-    background-color: #f8f9fa; 
+    background-color: #ffffff; 
     border: 1px solid #000; 
 }
 
 /* Admin & Extension Officer Tables */
 .table-shamba-header th {
-    background-color: #198754;
+    background-color: var(--sg-green-primary);
     color: #ffffff;
 }
 
 /* Tab Navigation Pills Styling */
 .nav-pills .nav-link.active {
-    background-color: #198754;
+    background-color: var(--sg-green-primary);
     color: #ffffff;
 }
 
 .nav-pills .nav-link {
-    color: #198754;
+    color: var(--sg-green-primary);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border-radius: 6px;
+    padding: 10px 14px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--sg-green-primary);
+    box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+}
+
+/* Footer */
+footer {
+    background-color: #ffffff;
+    border-top: 2px solid var(--sg-green-subtle);
 }
