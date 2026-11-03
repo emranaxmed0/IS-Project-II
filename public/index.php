@@ -41,7 +41,7 @@ require_once __DIR__ . '/../app/Views/header.php';
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <a href="userdashboard.php" class="btn btn-shamba px-4 fw-semibold">
+                <a href="dashboard.php" class="btn btn-shamba px-4 fw-semibold">
                     <i class="bi bi-speedometer2 me-1"></i> Dashboard
                 </a>
                 <a href="logout.php" class="btn btn-outline-danger fw-semibold px-3">
@@ -63,7 +63,7 @@ require_once __DIR__ . '/../app/Views/header.php';
                         <h5 class="fw-bold mb-0">Weather & Climate</h5>
                     </div>
                     <p class="text-muted">Check local weather forecasts and seasonal planting advice for <?= htmlspecialchars($user['region'] ?? 'your region') ?>.</p>
-                    <a href="userdashboard.php" class="text-shamba fw-bold text-decoration-none">View Weather Advisory &rarr;</a>
+                    <a href="dashboard.php" class="text-shamba fw-bold text-decoration-none">View Weather Advisory &rarr;</a>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@ require_once __DIR__ . '/../app/Views/header.php';
                         <h5 class="fw-bold mb-0">Crop Protection</h5>
                     </div>
                     <p class="text-muted">Identify crop diseases, pests, and get recommended remedies from local agricultural experts.</p>
-                    <a href="userdashboard.php" class="text-shamba fw-bold text-decoration-none">Explore Crop Guide &rarr;</a>
+                    <a href="dashboard.php" class="text-shamba fw-bold text-decoration-none">Explore Crop Guide &rarr;</a>
                 </div>
             </div>
         </div>
