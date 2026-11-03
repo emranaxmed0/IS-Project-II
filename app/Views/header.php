@@ -1,9 +1,17 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$user = $_SESSION['user'] ?? null;
+$userName = htmlspecialchars($user['user_name'] ?? $user['name'] ?? 'User');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShambaGuide - Dashboard</title>
+    <title>ShambaGuide</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -62,20 +70,44 @@
     </style>
 
     <link rel="stylesheet" href="css/style.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time(); ?>">
 </head>
 <body class="min-vh-100 d-flex flex-column justify-content-between">
 
     <!-- Top Green Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark shamba-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark shamba-navbar py-2">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 fs-4" href="index.php">
-                <i class="bi bi-flower1"></i>
+            <a class="navbar-brand fw-bold fs-4" href="index.php">
                 <span>ShambaGuide</span>
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <a href="userdashboard.php" class="btn btn-sm btn-outline-light px-3 me-2">
-                    <i class="bi bi-speedometer2 me-1"></i> Dashboard
-                </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#shambaNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="shambaNavbar">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3 text-white">
+                    <a href="dashboard.php" class="nav-link text-white fw-semibold">
+                        Dashboard
+                    </a>
+                    <a href="calendar.php" class="nav-link text-white fw-semibold">
+                        Kalenda
+                    </a>
+                    <a href="crops&disease.php" class="nav-link text-white fw-semibold">
+                        Wadudu na Magonjwa
+                    </a>
+
+                    <?php if ($user): ?>
+                        <div class="nav-item dropdown ms-lg-2">
+                            <button class="btn btn-sm btn-outline-light dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <?= $userName ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-dark shadow-sm">
+                                <li><a class="dropdown-item" href="profile.php">My Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger fw-semibold" href="logout.php">Logout</a></li>
+                            </ul>
+                            <?php endif; ?>
             </div>
         </div>
     </nav>
