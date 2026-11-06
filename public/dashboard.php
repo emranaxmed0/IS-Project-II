@@ -1,31 +1,36 @@
 <?php
 session_start();
 
-// Redirect to login if user is not authenticated
+// 1. Session Protection Check
 if (!isset($_SESSION['user'])) {
     header('Location: login.php');
     exit();
 }
 
-// Extract role_id from session (defaults to 1 = Farmer)
-$roleId = (int)($_SESSION['user']['role_id'] ?? $_SESSION['user']['role'] ?? 1);
+// 2. Extract role_id safely
+$user = $_SESSION['user'];
+$roleId = (int)($user['role_id'] ?? $_SESSION['role_id'] ?? 0);
 
-// Route based on user role
+// 3. Route to the correct dashboard based on role
 switch ($roleId) {
-    case 1: // Farmer / Smallholder
+    case 1:
+        // Farmer Role -> userdashboard.php
         header('Location: userdashboard.php');
         exit();
 
-    case 2: // Extension Officer
+    case 2:
+        // Extension Officer Role -> extensiondashboard.php
         header('Location: extensiondashboard.php');
         exit();
 
-    case 3: // Admin
-        header('Location: admin.php');
+    case 3:
+        // Admin Role -> admindashboard.php
+        header('Location: admindashboard.php');
         exit();
 
     default:
-        // Fallback for unexpected role values
-        header('Location: userdashboard.php');
+        // Fallback for missing or invalid roles
+        session_destroy();
+        header('Location: login.php?error=invalid_role');
         exit();
 }

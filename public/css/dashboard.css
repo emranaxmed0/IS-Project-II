@@ -13,6 +13,8 @@ body {
     background-color: var(--sg-bg-body);
     font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
     color: #2c3e50;
+    margin: 0;
+    padding: 0;
 }
 
 /* Brand Green Palette & Core Elements */
@@ -90,19 +92,243 @@ body {
 }
 
 /* Form Controls */
-.form-control, .form-select {
+.form-control, .form-select, input[type="text"], textarea {
     border-radius: 6px;
     padding: 10px 14px;
     border: 1px solid #ced4da;
+    box-sizing: border-box;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus, .form-select:focus, input[type="text"]:focus, textarea:focus {
     border-color: var(--sg-green-primary);
     box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    outline: none;
 }
 
 /* Footer */
 footer {
     background-color: #ffffff;
     border-top: 2px solid var(--sg-green-subtle);
+}
+
+/* ==========================================================================
+   Extension Dashboard & Messaging Layout
+   ========================================================================== */
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+/* Welcome Card Banner */
+.welcome-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-left: 5px solid var(--sg-green-primary);
+}
+
+.welcome-card h2 {
+    margin: 0;
+    color: var(--sg-green-primary);
+    font-size: 1.4rem;
+}
+
+.welcome-card p {
+    margin: 6px 0 0 0;
+    color: #666666;
+    font-size: 0.95rem;
+}
+
+/* Alert Message Banners */
+.alert-box {
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: var(--sg-green-light);
+    color: var(--sg-green-dark);
+    border: 1px solid var(--sg-green-subtle);
+}
+
+.alert-error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* Farmer Requests Grid Layout */
+.requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+/* Individual Farmer Request Card */
+.request-card {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid var(--sg-green-primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.farmer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.farmer-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.crop-tag {
+    background: var(--sg-green-light);
+    color: var(--sg-green-primary);
+    font-size: 0.8rem;
+    padding: 3px 12px;
+    border-radius: 15px;
+    font-weight: bold;
+    border: 1px solid var(--sg-green-subtle);
+}
+
+.query-text {
+    font-size: 0.95rem;
+    color: #333333;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 3px solid #ccc;
+}
+
+.query-footer {
+    font-size: 0.82rem;
+    color: #777777;
+    margin-bottom: 15px;
+}
+
+/* Button reply style */
+.btn-reply {
+    background-color: var(--sg-green-primary);
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-reply:hover {
+    background-color: var(--sg-green-dark);
+    box-shadow: 0 4px 10px rgba(27, 94, 32, 0.25);
+}
+
+/* Send SMS Modal Popup Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: var(--sg-green-primary);
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--sg-green-light);
+    padding-bottom: 8px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.form-group input, 
+.form-group textarea {
+    width: 100%;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--sg-green-primary);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--sg-green-primary);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.btn-cancel {
+    background: #757575;
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-cancel:hover {
+    background: #616161;
 }

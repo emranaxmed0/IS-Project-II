@@ -12,21 +12,26 @@ require_once __DIR__ . '/../app/Controllers/CropController.php';
 require_once __DIR__ . '/../app/Services/AIService.php';
 
 $user = $_SESSION['user'];
-$officerName = htmlspecialchars($user['user_name'] ?? $user['name'] ?? 'Officer');
+$officerName = htmlspecialchars($user['user_name'] ?? $user['name'] ?? $user['username'] ?? 'Officer');
 $assignedRegion = htmlspecialchars($user['region'] ?? 'Nakuru / Rift Valley');
 $officerId = (int)($user['user_id'] ?? $user['id'] ?? 0);
+
+// Fetch feedback alerts for SMS
+$successMsg = $_SESSION['msg_success'] ?? null;
+$errorMsg   = $_SESSION['msg_error'] ?? null;
+unset($_SESSION['msg_success'], $_SESSION['msg_error']);
 
 // Fetch all farmers operating in this Extension Officer's assigned region
 $farmersStmt = $pdo->prepare("
     SELECT user_id, user_name, phone_number, region 
-    FROM `User` 
+    FROM `user` 
     WHERE region = ? AND role_id = 1 
     ORDER BY user_name ASC
 ");
 $farmersStmt->execute([$assignedRegion]);
 $farmers = $farmersStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Determine currently active farmer (defaults to first farmer in list if available)
+// Determine currently active farmer
 $activeFarmerId = (int)($_REQUEST['farmer_id'] ?? $_REQUEST['assisted_farmer_id'] ?? ($farmers[0]['user_id'] ?? 0));
 $activeFarmer = null;
 
@@ -61,13 +66,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'new_chat') {
 // Active Chat Session ID
 $sessionId = $_GET['session_id'] ?? null;
 
-// Handle Advisory Query Submission (REAL-TIME AI RESPONSE + PRG Pattern)
+// Handle Advisory Query Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['query']) && $activeFarmerId > 0) {
     $submittedFarmerId = (int)($_POST['assisted_farmer_id'] ?? 0);
     $queryText = trim($_POST['query']);
 
     // Verify target farmer belongs to officer's assigned region
-    $verifyStmt = $pdo->prepare("SELECT user_id FROM `User` WHERE user_id = ? AND region = ? AND role_id = 1");
+    $verifyStmt = $pdo->prepare("SELECT user_id FROM `user` WHERE user_id = ? AND region = ? AND role_id = 1");
     $verifyStmt->execute([$submittedFarmerId, $assignedRegion]);
 
     if ($verifyStmt->fetch()) {
@@ -79,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['query']) && $activeF
         $aiService = new AIService();
         $aiResponse = $aiService->generateAdvice($queryText, $activeCropName, $assignedRegion);
 
-        // 2. Insert both question and response directly into Query_Log for the farmer
+        // 2. Insert into Query_Log
         $insertStmt = $pdo->prepare("
             INSERT INTO Query_Log (user_id, crop_id, session_id, query_text, response_text, language) 
             VALUES (?, ?, ?, ?, ?, 'Swahili')
@@ -87,12 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['query']) && $activeF
         $insertStmt->execute([$submittedFarmerId, $selectedCropId, $sessionId, $queryText, $aiResponse]);
     }
 
-    // 3. Redirect (PRG Pattern) to prevent duplicate submission on refresh
     header("Location: extensiondashboard.php?farmer_id={$submittedFarmerId}&crop_id={$selectedCropId}&session_id={$sessionId}");
     exit();
 }
 
-// Fetch all past chat sessions for the active farmer
+// Fetch all past chat sessions for active farmer
 $pastThreads = [];
 if ($activeFarmerId > 0) {
     $threadsStmt = $pdo->prepare("
@@ -106,7 +110,6 @@ if ($activeFarmerId > 0) {
     $pastThreads = $threadsStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Default to most recent thread if none selected
 if (!$sessionId && !empty($pastThreads)) {
     $sessionId = $pastThreads[0]['session_id'];
 }
@@ -129,6 +132,18 @@ require_once __DIR__ . '/../app/Views/header.php';
 
 <!-- Main Content -->
 <div class="container-fluid py-4 px-4">
+
+    <!-- Status Feedback Banners -->
+    <?php if ($successMsg): ?>
+        <div class="alert alert-success border border-dark shadow-sm fw-bold mb-3">
+            <i class="bi bi-check-circle-fill me-2"></i> <?= htmlspecialchars($successMsg) ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($errorMsg): ?>
+        <div class="alert alert-danger border border-dark shadow-sm fw-bold mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= htmlspecialchars($errorMsg) ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Active Context & Farmer Selection Banner -->
     <div class="card border-dark shadow-sm mb-4">
@@ -245,14 +260,29 @@ require_once __DIR__ . '/../app/Views/header.php';
                                 </div>
                             </div>
 
-                            <!-- AI Response Bubble -->
+                            <!-- AI Response Bubble + Send SMS Action -->
                             <?php if (!empty($msg['response_text'])): ?>
                                 <div class="d-flex justify-content-start mb-4">
                                     <div class="bg-light p-3 rounded-3 col-md-9 border border-dark shadow-sm">
                                         <h6 class="fw-bold text-shamba mb-2">
                                             <i class="bi bi-robot me-1"></i> ShambaGuide AI Response:
                                         </h6>
-                                        <p class="mb-0"><?= nl2br(htmlspecialchars($msg['response_text'])) ?></p>
+                                        <p class="mb-3"><?= nl2br(htmlspecialchars($msg['response_text'])) ?></p>
+                                        
+                                        <!-- Send SMS Button using safely encoded JSON -->
+                                        <?php if ($activeFarmer): ?>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-shamba border border-dark fw-bold d-inline-flex align-items-center gap-1"
+                                                    onclick='openSMSModal(
+                                                        <?= (int)$activeFarmer["user_id"] ?>, 
+                                                        <?= json_encode($activeFarmer["user_name"]) ?>, 
+                                                        <?= json_encode($activeFarmer["phone_number"]) ?>, 
+                                                        <?= json_encode($activeCropName) ?>, 
+                                                        <?= json_encode($msg["response_text"]) ?>
+                                                    )'>
+                                                <i class="bi bi-phone-vibrate"></i> Tuma SMS kwa Mkulima
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -277,6 +307,59 @@ require_once __DIR__ . '/../app/Views/header.php';
     </div>
 </div>
 
+<!-- Send SMS Modal -->
+<div class="modal fade" id="smsDispatchModal" tabindex="-1" aria-labelledby="smsDispatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border border-dark shadow">
+            <div class="modal-header bg-shamba text-white border-bottom border-dark">
+                <h5 class="modal-header-title mb-0 fw-bold" id="smsDispatchModalLabel">
+                    <i class="bi bi-chat-left-dots-fill me-1"></i> Tuma Ushauri kwa SMS
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="send_message.php" method="POST">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="receiver_id" id="sms_receiver_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mkulima (Farmer):</label>
+                        <input type="text" id="sms_farmer_name" class="form-control border-dark bg-light" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Namba ya Simu (Phone Number):</label>
+                        <input type="text" id="sms_farmer_phone" class="form-control border-dark bg-light" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Zao (Crop):</label>
+                        <input type="text" name="crop_name" id="sms_crop_name" class="form-control border-dark bg-light" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ujumbe / Ushauri (SMS Text):</label>
+                        <textarea name="message_text" id="sms_message_text" rows="5" class="form-control border-dark" required></textarea>
+                        <div class="form-text text-muted">Unaweza kurekebisha au kufupisha ujumbe kabla ya kutuma kwa SMS.</div>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input border-dark" type="checkbox" name="send_sms" value="1" id="send_sms_check" checked>
+                        <label class="form-check-label fw-semibold text-success" for="send_sms_check">
+                            📱 Tuma pia kama Ujumbe wa Simu (SMS via Africa's Talking)
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top border-dark">
+                    <button type="button" class="btn btn-secondary border border-dark fw-bold" data-bs-dismiss="modal">Ghairi</button>
+                    <button type="submit" class="btn btn-shamba border border-dark fw-bold">
+                        <i class="bi bi-send-fill me-1"></i> Tuma Sasa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     var container = document.querySelector('.chat-container');
@@ -284,7 +367,6 @@ document.addEventListener("DOMContentLoaded", function() {
         container.scrollTop = container.scrollHeight;
     }
 
-    // Disable button & show spinner during POST submit
     var form = document.getElementById('extensionQueryForm');
     var btn = document.getElementById('extensionSubmitBtn');
     if (form && btn) {
@@ -294,6 +376,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+function openSMSModal(farmerId, farmerName, farmerPhone, cropName, aiAdvice) {
+    document.getElementById('sms_receiver_id').value = farmerId;
+    document.getElementById('sms_farmer_name').value = farmerName;
+    document.getElementById('sms_farmer_phone').value = farmerPhone;
+    document.getElementById('sms_crop_name').value = cropName;
+    document.getElementById('sms_message_text').value = aiAdvice;
+
+    var smsModal = new bootstrap.Modal(document.getElementById('smsDispatchModal'));
+    smsModal.show();
+}
 </script>
 
 <?php 
