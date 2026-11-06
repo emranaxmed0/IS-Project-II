@@ -4,15 +4,18 @@ class AIService {
     private string $apiKey;
 
     public function __construct() {
-        // Load API key from environment variable or set your key directly
-        $this->apiKey = getenv('GEMINI_API_KEY') ?: 'YOUR_GEMINI_API_KEY_HERE';
+        $this->apiKey = getenv('GEMINI_API_KEY') ?: 'AQ.Ab8RN6LzDFotfIWcCEH6d3QzdaKiPmt83FoOQMAyyEtG9m1afA';
     }
 
     /**
-     * Generates an agricultural advice response in Swahili via Gemini 1.5 Flash API.
+     * Generates an agricultural advice response in Swahili via Gemini API.
      */
     public function generateAdvice(string $userQuery, string $cropName = 'Kilimo', string $region = 'Kenya'): string {
-        $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $this->apiKey;
+        // Active model endpoints array
+        $models = [
+            'gemini-3.8-flash',
+            'gemini-3.5-flash-lite'
+        ];
 
         $systemPrompt = "Wewe ni Mtaalamu wa Kilimo nchini Kenya (ShambaGuide AI). " .
                         "Unatoa ushauri sahihi, wa kueleweka, na wenye tija kwa wakulima wadogo. " .
@@ -28,21 +31,52 @@ class AIService {
             ]
         ];
 
-        $ch = curl_init($endpoint);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $lastError = '';
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        foreach ($models as $model) {
+            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . trim($this->apiKey);
 
-        if ($httpCode === 200 && $response) {
-            $data = json_decode($response, true);
-            return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Samahani, sikuweza kupata majibu kwa sasa. Tafadhali jaribu tena.';
+            $ch = curl_init($endpoint);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json'
+            ]);
+            
+            // Disable SSL certificate verification for local XAMPP testing
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                $aiText = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                if (!empty($aiText)) {
+                    return $aiText;
+                }
+            }
+
+            if (!empty($curlError)) {
+                return "cURL Network Error: " . $curlError;
+            }
+
+            if (!empty($response)) {
+                $errorData = json_decode($response, true);
+                $apiErrorMessage = $errorData['error']['message'] ?? $response;
+                $lastError = "API Error (HTTP {$httpCode} on {$model}): " . $apiErrorMessage;
+
+                // Stop loop on standard client errors like 400 or 403
+                if ($httpCode !== 503 && $httpCode !== 429 && $httpCode !== 404) {
+                    break;
+                }
+            }
         }
 
-        return "Asante kwa swali lako kuhusu {$cropName}. Mfumo wetu unapitia ushauri wa kitaalamu na utapokea majibu hivi karibuni.";
+        return $lastError ?: "Samahani, sikufanikiwa kuwasiliana na mfumo wa AI kwa sasa.";
     }
 }
