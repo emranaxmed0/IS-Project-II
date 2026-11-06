@@ -93,7 +93,7 @@ $userName = htmlspecialchars($user['user_name'] ?? $user['name'] ?? 'User');
                     <a href="calendar.php" class="nav-link text-white fw-semibold">
                         Kalenda
                     </a>
-                    <a href="crops&disease.php" class="nav-link text-white fw-semibold">
+                    <a href="pests&diseases.php" class="nav-link text-white fw-semibold">
                         Wadudu na Magonjwa
                     </a>
 
