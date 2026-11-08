@@ -93,19 +93,47 @@ class AIService {
 
     private function retrieveDocumentContext(string $query, string $cropName): string {
         try {
-            $sql = "SELECT chunk_text, crop_type FROM document_chunks";
             $params = [];
+            $whereClause = [];
 
             if (!empty($cropName) && strtolower($cropName) !== 'kilimo') {
-                $sql .= " WHERE LOWER(crop_type) = LOWER(:crop)";
-                $params['crop'] = $cropName;
+                 $whereClause[] = "LOWER(crop_type) = LOWER(:crop)";
+                 $params['crop'] = $cropName;
             }
 
+    $keywords = array_filter(explode(' ', preg_replace('/[^\w\s]/u', '', $query)));
+            $likeConditions = [];
+            
+            $i = 0;
+            foreach ($keywords as $word) {
+                if (mb_strlen($word) > 3) { // Skip short words like 'na', 'wa', 'kwa'
+                    $paramKey = "kw_" . $i;
+                    $likeConditions[] = "chunk_text LIKE :{$paramKey}";
+                    $params[$paramKey] = '%' . $word . '%';
+                    $i++;        
+                }
+            }
+
+            if (!empty($likeConditions)) {
+                $whereClause[] = "(" . implode(" OR ", $likeConditions) . ")";
+            }
+
+            $sql = "SELECT chunk_text, crop_type FROM document_chunks";
+            if (!empty($whereClause)) {
+                $sql .= " WHERE " . implode(" AND ", $whereClause);
+            }
             $sql .= " LIMIT 4";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute($params);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fallback: If no matching keywords found, grab top rows for that crop
+            if (empty($rows) && !empty($cropName) && strtolower($cropName) !== 'kilimo') {
+                $fallbackStmt = $this->db->prepare("SELECT chunk_text, crop_type FROM document_chunks WHERE LOWER(crop_type) = LOWER(:crop) LIMIT 3");
+                $fallbackStmt->execute(['crop' => $cropName]);
+                $rows = $fallbackStmt->fetchAll(PDO::FETCH_ASSOC);
+            }
 
             if (empty($rows)) {
                 return "Hakuna mwelekeo wa moja kwa moja uliopatikana kwenye stakabadhi kwa sasa.";
@@ -117,8 +145,10 @@ class AIService {
             }
 
             return implode("\n\n---\n\n", $contextArray);
+
         } catch (Exception $e) {
             return "Hakuna mwelekeo wa moja kwa moja uliopatikana.";
+        
         }
     }
 }
