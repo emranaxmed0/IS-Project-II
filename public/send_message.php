@@ -1,16 +1,11 @@
 <?php
 session_start();
 
-// 1. Session & Auth Check
-if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit();
-}
-
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../app/Services/SMSService.php';
+require_once __DIR__ . '/../app/Services/AIService.php';
 
-// Helper function to format phone numbers to international standard required by AT Sandbox (+254...)
+// Helper function to format phone numbers to international standard (+254...)
 function formatKenyanPhoneNumber($phone) {
     $phone = preg_replace('/[^\d+]/', '', trim($phone));
     if (substr($phone, 0, 1) === '0') {
@@ -19,6 +14,53 @@ function formatKenyanPhoneNumber($phone) {
         return '+' . $phone;
     }
     return $phone;
+}
+
+// -------------------------------------------------------------
+// WORKFLOW 1: JSON / AJAX Request (AI Assistant Chat UI)
+// -------------------------------------------------------------
+$rawInput = file_get_contents('php://input');
+$jsonData = json_decode($rawInput, true);
+
+if (!empty($jsonData) && isset($jsonData['message'])) {
+    header('Content-Type: application/json');
+
+    $userQuery = trim($jsonData['message']);
+    $cropName  = trim($jsonData['crop'] ?? 'Kilimo');
+    $region    = trim($jsonData['region'] ?? 'Kenya');
+
+    if (empty($userQuery)) {
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Tafadhali weka swali lako.'
+        ]);
+        exit();
+    }
+
+    try {
+        $aiService = new AIService();
+        $reply = $aiService->generateAdvice($userQuery, $cropName, $region);
+
+        echo json_encode([
+            'success' => true,
+            'query'   => $userQuery,
+            'crop'    => $cropName,
+            'region'  => $region,
+            'reply'   => $reply
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Hitilafu ya AI: ' . $e->getMessage()
+        ]);
+    }
+    exit();
+}
+
+// 1. Session & Auth Check
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
 }
 
 // Extract extension officer ID safely
