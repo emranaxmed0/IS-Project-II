@@ -251,8 +251,8 @@ function getCropBadgeClass($cropName) {
                 <!-- Default 4 Scope Crops Fallback Cards -->
                 <?php 
                 $defaultScopeCrops = [
-                    ['name' => 'Mahindi (Maize)', 'badge' => 'badge-maize', 'plant' => 'Machia - Aprili', 'harvest' => 'Agosti - September', 'note' => 'Panda na mbolea ya DAP wakati wa mvua za kwanza.'],
-                    ['name' => 'Maharagwe (Beans)', 'badge' => 'badge-beans', 'plant' => 'Machia - Aprili', 'harvest' => 'Juni - Julai', 'note' => 'Palilia mapema kuzuia magonjwa ya mizizi.'],
+                    ['name' => 'Mahindi (Maize)', 'badge' => 'badge-maize', 'plant' => 'Machi - Aprili', 'harvest' => 'Agosti - September', 'note' => 'Panda na mbolea ya DAP wakati wa mvua za kwanza.'],
+                    ['name' => 'Maharagwe (Beans)', 'badge' => 'badge-beans', 'plant' => 'Machi - Aprili', 'harvest' => 'Juni - Julai', 'note' => 'Palilia mapema kuzuia magonjwa ya mizizi.'],
                     ['name' => 'Viazi (Potatoes)', 'badge' => 'badge-potatoes', 'plant' => 'Aprili - Mei', 'harvest' => 'Julai - Agosti', 'note' => 'Tumia mbegu zilizothibitishwa zizizo na magonjwa.'],
                     ['name' => 'Nyanya (Tomatoes)', 'badge' => 'badge-tomatoes', 'plant' => 'Kituo cha Mche / Mwaka mzima', 'harvest' => 'Miezi 3 baada ya kupanda', 'note' => 'Hakikisha maji ya kutosha na dawa ya kuzuia blight.']
                 ];

@@ -9,7 +9,7 @@ class AIService {
     private PDO $db;
 
     public function __construct() {
-        $this->apiKey = getenv('GEMINI_API_KEY') ?: 'AQ.Ab8RN6LzDFotfIWcCEH6d3QzdaKiPmt83FoOQMAyyEtG9m1afA';
+        $this->apiKey = getenv('GEMINI_API_KEY') ?: 'AQ.Ab8RN6IIp5Q0nbTqedgG2ndgB0S5SmwmFsHLn-n7siUCzqYiCA';
 
         global $pdo; 
         $this->db = $pdo;
@@ -22,8 +22,8 @@ class AIService {
     $retrievedContext = $this->retrieveDocumentContext($userQuery, $cropName);    
         // Active model endpoints array
         $models = [
-            'gemini-3.8-flash',
-            'gemini-3.5-flash-lite'
+            'gemini-3.5-flash-lite',
+            'gemini-3.5-flash'
         ];
 
         $systemPrompt = "Wewe ni Mtaalamu wa Kilimo nchini Kenya (ShambaGuide AI).\n" .

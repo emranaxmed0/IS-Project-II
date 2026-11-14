@@ -25,7 +25,7 @@ switch ($roleId) {
 
     case 3:
         // Admin Role -> admindashboard.php
-        header('Location: admindashboard.php');
+        header('Location: admin.php');
         exit();
 
     default:
